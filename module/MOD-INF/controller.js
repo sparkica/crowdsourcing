@@ -45,7 +45,7 @@ function init() {
 	//var OR = Packages.com.google.refine.operations.OperationRegistry;
 
   RS.registerCommand(module, "create-crowdflower-job", new Packages.com.google.refine.crowdsourcing.crowdflower.CreateNewJobCommand());
-	
+  RS.registerCommand(module, "preview-crowdflower-jobs", new Packages.com.google.refine.crowdsourcing.crowdflower.PreviewExistingJobsCommand());
   // Script files to inject into /project page
   ClientSideResourceManager.addPaths(
     "project/scripts",

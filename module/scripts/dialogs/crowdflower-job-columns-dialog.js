@@ -9,6 +9,11 @@ function ZemantaCrowdFlowerDialog(onDone) {
   this._elmts.dialogHeader.text("Enter details for new CrowdFlower job");
   
   this._elmts.jobTabs.tabs();
+
+  ZemantaCrowdFlowerDialog.renderAllExistingJobs(this._elmts.existingJobTab);
+  ZemantaCrowdFlowerDialog.renderAllColumns(this._elmts.columnList);
+  this._elmts.columnList.hide();
+  
   
   this._elmts.okButton.click(function() {
       self._extension.title= self._elmts.jobTitle.val();
@@ -16,7 +21,6 @@ function ZemantaCrowdFlowerDialog(onDone) {
       self._extension.content_type = "json";
       self._extension.column_names = [];
       self._extension.new_job = true;
-      //self._extension.id="142827";
       self._extension.upload = self._elmts.uploadChkbox.is(':checked');
 
       
@@ -32,15 +36,15 @@ function ZemantaCrowdFlowerDialog(onDone) {
   
   
   this._elmts.cancelButton.click(function() {
+	  
+	  var curTabPanel = $('#jobTabs .ui-tabs-panel:not(.ui-tabs-hide)');
+	  
+	  var index = curTabPanel.index();
+	  alert("Index: " + index);
+	  
     DialogSystem.dismissUntil(self._level - 1);
   });
-  
-  
-  colsHTML = ZemantaCrowdFlowerDialog.renderAllColumns();
-  colsHTML.appendTo(this._elmts.columnList);
-  
-  this._elmts.columnList.hide();//find(':input:not(:disabled)').prop('disabled', true);
-  
+   
   this._elmts.uploadChkbox.click(function() {
 	  
 	  var enabled = self._elmts.uploadChkbox.is(':checked');
@@ -57,7 +61,7 @@ function ZemantaCrowdFlowerDialog(onDone) {
   this._elmts.jobTitle.blur(function () {
 	  var title = self._elmts.jobTitle.val();
 	  
-	  if(title.length < 5) {
+	  if(title.length < 5 || title.length > 255  ) {
 		  alert("Title should be between 5 and 255 chars.");
 	  }
 	  
@@ -68,8 +72,33 @@ function ZemantaCrowdFlowerDialog(onDone) {
   
 };
 
+ZemantaCrowdFlowerDialog.renderAllExistingJobs = function(elem) {
+	
+	
+	var jobsContainer = $('<div id="existing-jobs">'); 
+	var selContainer = $('<select name="all-jobs">');
+	ZemantaExtension.util.loadAllExistingJobs(function(data) {
+		
+		console.log("Data: " + JSON.stringify(data));
+		
+		//var data = JSON.parse(data);
+		console.log("Jobs:" + data);
+		
+		$.each(data, function(index, value) {
+			
+			var title = (value.title == null)? "Title not defined" : value.title;
+			
+			var job = $('<option name="opt_' + index + '" value=' + value.id + '>' + title + ' (job id: ' + value.id + ')</option>');
+			selContainer.append(job);
+		});
+		
+		jobsContainer.append(selContainer);
+		elem.append(jobsContainer);
+	});
+};
 
-ZemantaCrowdFlowerDialog.renderAllColumns = function() {
+
+ZemantaCrowdFlowerDialog.renderAllColumns = function(elem) {
 	  
 	var columns = theProject.columnModel.columns;
 	
@@ -105,5 +134,5 @@ ZemantaCrowdFlowerDialog.renderAllColumns = function() {
 		});
 	});
 	
-	return columnContainer;	
+	columnContainer.appendTo(elem);	
 };

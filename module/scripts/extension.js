@@ -6,7 +6,7 @@ ZemantaExtension.util.loadCrowdFlowerApiKeyFromSettings = function(getApiKey) {
 		      "/command/core/get-all-preferences",
 		      {},
 		      function (data) {
-		    	if (data && data["crowdflower.apikey"]) {
+		    	if (data!=null && data["crowdflower.apikey"]!=null) {
 		    		getApiKey(data["crowdflower.apikey"]);
 		    	}
 		    	else {
@@ -17,6 +17,30 @@ ZemantaExtension.util.loadCrowdFlowerApiKeyFromSettings = function(getApiKey) {
 		      "json"
 	 );	
 };
+
+ZemantaExtension.util.loadAllExistingJobs = function(getJobs) {
+//	getJobs(
+//			'[' +
+//			'{"id": 1, "title":null}, {"id":122, "title":"jay!"}' +
+//			']'
+//			);
+    $.post(
+  		  "command/crowdsourcing/preview-crowdflower-jobs",
+  		  { 
+  		  },
+  		  function(data)
+  		  {
+  			  if(data != null) {
+  	  			  console.log("Status: " + data.status);
+  	  			  getJobs(data['jobs']);
+  			  }
+  		  },
+  		  "json"
+    );     
+
+};
+
+
 
 ZemantaExtension.handlers.storeCrowdFlowerAPIKey = function() {
 	
@@ -36,6 +60,7 @@ ZemantaExtension.handlers.storeCrowdFlowerAPIKey = function() {
 		);
 	});
 };
+
 
 ZemantaExtension.handlers.doNothing = function() {
 	alert("Crowdsourcing extension active...");
