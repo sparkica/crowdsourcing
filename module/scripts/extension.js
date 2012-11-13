@@ -19,11 +19,6 @@ ZemantaExtension.util.loadCrowdFlowerApiKeyFromSettings = function(getApiKey) {
 };
 
 ZemantaExtension.util.loadAllExistingJobs = function(getJobs) {
-//	getJobs(
-//			'[' +
-//			'{"id": 1, "title":null}, {"id":122, "title":"jay!"}' +
-//			']'
-//			);
     $.post(
   		  "command/crowdsourcing/preview-crowdflower-jobs",
   		  { 
@@ -32,7 +27,12 @@ ZemantaExtension.util.loadAllExistingJobs = function(getJobs) {
   		  {
   			  if(data != null) {
   	  			  console.log("Status: " + data.status);
-  	  			  getJobs(data['jobs']);
+  	  			  if(data.status != "ERROR") {
+  	  				  getJobs(data['jobs']);
+  	  			  } else{
+  	  				  console.log(data);
+  	  				alert("Error occured while loading existing jobs. Error: " + data['message']);  
+  	  			  }
   			  }
   		  },
   		  "json"
@@ -105,7 +105,7 @@ ZemantaExtension.handlers.getApiKey =  function() {
 
 
 
-
+//todo: add configuration for job: number of judgements, gold, etc.
 ExtensionBar.addExtensionMenu({
 	"id": "zemanta",
 	"label": "Zemanta",
@@ -119,22 +119,23 @@ ExtensionBar.addExtensionMenu({
 			 "id" : "zemanta/crowdflower",
 			 "label" : "CrowdFlower service",
 			 "submenu" : [
-			              {
-			            	  "id":"zemanta/crowdflower/test",
-			            	  "label": "Test",
-			            	  click: ZemantaExtension.handlers.getApiKey
-			              },
+				    		 {
+				    			 "id": "zemanta/crowdflower/create-crowdflower-job",
+				    			 label: "Create new job",
+				    			 click: ZemantaExtension.handlers.openJobSettingsDialog
+				    		 },
+				    		 {
+				    			 "id": "zemanta/crowdflower/configure-job",
+				    			 "label" :  "Configure job",
+				    			 click: ZemantaExtension.handlers.doNothing 
+				    		 },
+				    		 {},
+
 			     		 {
 			    			 "id": "zemanta/crowdflower/settings",
 			    			 "label": "Set CrowdFlower API key",
 			    			 click: ZemantaExtension.handlers.storeCrowdFlowerAPIKey
 			    		 },
-			    		 {},
-			    		 {
-			    			 "id": "zemanta/crowdflower/create-crowdflower-job",
-			    			 label: "Create new job",
-			    			 click: ZemantaExtension.handlers.openJobSettingsDialog
-			    		 }
 			              ]
 		 },
 		 {},

@@ -80,17 +80,22 @@ ZemantaCrowdFlowerDialog.renderAllExistingJobs = function(elem) {
 	ZemantaExtension.util.loadAllExistingJobs(function(data) {
 		
 		console.log("Data: " + JSON.stringify(data));
-		
-		//var data = JSON.parse(data);
-		console.log("Jobs:" + data);
-		
+				
 		$.each(data, function(index, value) {
 			
 			var title = (value.title == null)? "Title not defined" : value.title;
 			
 			var job = $('<option name="opt_' + index + '" value=' + value.id + '>' + title + ' (job id: ' + value.id + ')</option>');
+			
 			selContainer.append(job);
 		});
+		
+		
+		selContainer.change(function() {
+			alert($(this).children(":selected").val());
+		});
+		
+		
 		
 		jobsContainer.append(selContainer);
 		elem.append(jobsContainer);

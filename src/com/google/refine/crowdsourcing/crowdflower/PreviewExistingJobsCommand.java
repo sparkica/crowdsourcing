@@ -40,7 +40,8 @@ public class PreviewExistingJobsCommand extends Command {
                 try {
                 
                     CrowdFlowerClient cf_client = new CrowdFlowerClient(apiKey);
-                    cf_client.setTimeout(3000); //more time needed
+                    //TODO: more like a hack
+                    cf_client.setTimeout(2000); //more time needed than default
                     String response_msg = "";
                     
                     response_msg = cf_client.getAllJobs();
@@ -49,8 +50,6 @@ public class PreviewExistingJobsCommand extends Command {
                     writer.object();
                     writer.key("status"); writer.value(obj.getString("status"));
                 
-                    System.out.println("Status: " + obj.getString("status"));
-                    
                     if(obj != null && obj.has("response") && obj.get("response") != null) {
                     
                       writer.key("jobs").array();
@@ -60,7 +59,6 @@ public class PreviewExistingJobsCommand extends Command {
 
                     
                         for (int i=0; i < obj2.length(); i++) {
-                            //get job id and title if possible
                             JSONObject current = obj2.getJSONObject(i);
                             System.out.println("Current.id: " + current.get("id"));
                             
@@ -73,6 +71,8 @@ public class PreviewExistingJobsCommand extends Command {
                             
                          }
                          writer.endArray();
+                    } else {
+                        writer.key("message"); writer.value(obj.getString("message"));
                     }
                 } catch(JSONException e) {
                     writer.key("status"); writer.value("ERROR");
