@@ -28,10 +28,11 @@ ZemantaExtension.util.loadAllExistingJobs = function(getJobs) {
   			  if(data != null) {
   	  			  console.log("Status: " + data.status);
   	  			  if(data.status != "ERROR") {
-  	  				  getJobs(data['jobs']);
+  	  				  getJobs(data['jobs'],data.status);
   	  			  } else{
   	  				  console.log(data);
-  	  				alert("Error occured while loading existing jobs. Error: " + data['message']);  
+  	  				  alert("Error occured while loading existing jobs. Error: " + data['message']);  
+  	  				  getJobs([], data.message);
   	  			  }
   			  }
   		  },
@@ -39,6 +40,52 @@ ZemantaExtension.util.loadAllExistingJobs = function(getJobs) {
     );     
 
 };
+
+
+//jobParams: jobID, all_units - default false, gold - default false
+//copy job, return updated list of jobs and new job id
+ZemantaExtension.util.copyJob = function(extension, updateJobs) {
+		
+    $.post(
+  		  "command/crowdsourcing/copy-crowdflower-job",
+  		  {"extension": JSON.stringify(extension)},
+  		  function(data)
+  		  {
+  			  console.log("Data returned: " + JSON.stringify(data));
+  			  
+  			  if(data != null) {
+  	  			  console.log("Status: " + data.status);
+  	  			  updateJobs(data);
+  			  } 
+  			  else {
+  				  alert("Could not refresh list of jobs.");
+  			  }
+  		  },
+  		  "json"
+    );     
+};
+
+
+ZemantaExtension.util.getJobInfo = function(extension, updateJobInfo) {
+	
+    $.post(
+  		  "command/crowdsourcing/get-crowdflower-job",
+  		  {"extension": JSON.stringify(extension)},
+  		  function(data)
+  		  {
+  			  console.log("Data returned: " + data);
+  			  
+  			  if(data != null) {
+  	  			  console.log("Status: " + data.status);
+  	  			  updateJobInfo(data);
+  			  } else {
+  				alert("Error occured while updating job information.");  
+  			  }
+  		  },
+  		  "json"
+    );     
+};
+
 
 
 
@@ -53,7 +100,8 @@ ZemantaExtension.handlers.storeCrowdFlowerAPIKey = function() {
 	          },
 	          function(o) {
 	            if (o.code == "error") {
-	              alert(o.message);
+	            	
+	            	alert(o.message);
 	            }
 	          },
 	          "json"
@@ -75,7 +123,7 @@ ZemantaExtension.handlers.openJobSettingsDialog = function()  {
 	new ZemantaCrowdFlowerDialog(function(extension) {
 		var dismissBusy = DialogSystem.showBusy();
 		
-		console.log(extension);
+		//TODO: create new of upload to existing - is there a significant difference in the code?
 		
 	      $.post(
 	    		  "command/crowdsourcing/create-crowdflower-job",
@@ -121,13 +169,19 @@ ExtensionBar.addExtensionMenu({
 			 "submenu" : [
 				    		 {
 				    			 "id": "zemanta/crowdflower/create-crowdflower-job",
-				    			 label: "Create new job",
+				    			 label: "Create new job / upload data",
 				    			 click: ZemantaExtension.handlers.openJobSettingsDialog
 				    		 },
 				    		 {
 				    			 "id": "zemanta/crowdflower/configure-job",
 				    			 "label" :  "Configure job",
 				    			 click: ZemantaExtension.handlers.doNothing 
+				    		 },
+				    		 {
+				    			"id": "zemanta/crowdflower/download-results",
+				    			"label": "Download results",
+				    			click: ZemantaExtension.handlers.doNothing
+				    			 
 				    		 },
 				    		 {},
 

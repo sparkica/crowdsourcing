@@ -87,7 +87,8 @@ public class CreateNewJobCommand extends Command{
                 //ERROR
                 System.out.println("Missing job id!");
             }
-                
+            
+            
             if(extension.getBoolean("upload")) {
                 
                 System.out.println("Generating objects for upload....");
@@ -149,8 +150,9 @@ public class CreateNewJobCommand extends Command{
                     for (int c=0; c < column_names.length(); c++) {
                         int cell_index = _cell_indeces.get(c);
                         String key = column_names.get(c).toString();
-                        String value = (String) project.rows.get(row_index).getCellValue(cell_index);
-                        obj.put(key, value);
+                        Object value = project.rows.get(row_index).getCellValue(cell_index);
+                        
+                        obj.put(key, value.toString());
                     } 
                     
                     System.out.println("Data: " + obj.toString());

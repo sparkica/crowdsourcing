@@ -1,1 +1,3 @@
+test-output/
+.DS_Store
 *.class
