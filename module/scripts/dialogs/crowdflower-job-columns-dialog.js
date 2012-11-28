@@ -131,9 +131,10 @@ ZemantaCrowdFlowerDialog.prototype._copyAndUpdateJob = function(jobid) {
 ZemantaCrowdFlowerDialog.prototype._updateJobList = function(data) {
 	var self = this;
 	var selContainer = self._elmts.allJobsList;
-	var jobs = data["jobs"];
 	var selected = "";
+	var status = data["status"];
     var dismissBusy = DialogSystem.showBusy();
+    var message = "";
 
 	console.log("Data: " + JSON.stringify(data));
 	
@@ -141,20 +142,34 @@ ZemantaCrowdFlowerDialog.prototype._updateJobList = function(data) {
 	
 	$('<option name="opt_none" value="none">--- select a job --- </option>').appendTo(selContainer);
 	
-	for (var index = 0; index < jobs.length; index++) {
-		var value = jobs[index];
-		console.log("Value: " + value);
-		
-		if(value.id === data.job_id) {
-			selected = " selected";
-		} else {
-			selected = "";
-		}
-		
-		var job = $('<option name="opt_' + index + '" value=' + value.id + '' + selected + '>' + value.title + ' (job id: ' + value.id + ')</option>');		
-		selContainer.append(job);
 
+	if(status === "ERROR") {
+		self._elmts.statusMessage.html(status + ": " + data["message"]);
 	}
+	else {
+	
+		self._elmts.statusMessage.html("OK");
+		
+		if(data["jobs"] && data["jobs"]!= null) {
+			var jobs = data["jobs"];
+		
+			for (var index = 0; index < jobs.length; index++) {
+				var value = jobs[index];
+				console.log("Value: " + value);
+				
+				if(value.id === data.job_id) {
+					selected = " selected";
+				} else {
+					selected = "";
+				}
+				
+				var job = $('<option name="opt_' + index + '" value=' + value.id + '' + selected + '>' + value.title + ' (job id: ' + value.id + ')</option>');		
+				selContainer.append(job);
+		
+			}
+		}
+	}
+
 	
 	dismissBusy();
 };
