@@ -2,6 +2,7 @@
 function ZemantaCrowdFlowerDialog(onDone) {
   this._onDone = onDone;
   this._extension = {};
+  this._mappedFields = [];
   var dismissBusy = DialogSystem.showBusy();
     
   this._dialog = $(DOM.loadHTML("crowdsourcing", "scripts/dialogs/crowdflower-job-columns-dialog.html"));
@@ -21,8 +22,8 @@ function ZemantaCrowdFlowerDialog(onDone) {
   this._elmts.columnsPanel.hide();
   
   //TODO: hide this after testing
-  //this._elmts.extFieldsPanel.hide();
-  //this._elmts.extColumnsPanel.hide();
+  this._elmts.extFieldsPanel.hide();
+  this._elmts.extColumnsPanel.hide();
   
   this._elmts.chkUploadToNewJob.click(function () {
 	
@@ -59,7 +60,6 @@ function ZemantaCrowdFlowerDialog(onDone) {
     	  col.name = $(this).attr('value');
     	  col.safe_name = ZemantaExtension.util.convert2SafeName(col.name);
     	  self._extension.column_names.push(col);
-    	  //self._extension.column_names.push($(this).attr('value'));
       });
       
       if(self._extension.column_names.length < 1) {
@@ -134,7 +134,6 @@ ZemantaCrowdFlowerDialog.prototype._updateJobList = function(data) {
 	var selected = "";
 	var status = data["status"];
     var dismissBusy = DialogSystem.showBusy();
-    var message = "";
 
 	console.log("Data: " + JSON.stringify(data));
 	
@@ -201,7 +200,6 @@ ZemantaCrowdFlowerDialog.prototype._renderAllExistingJobs = function() {
 			console.log("Job id changed:" + JSON.stringify(this._extension));
 			
 			ZemantaExtension.util.getJobInfo(this._extension, function(data){
-				  console.log("Updating job.");
 				 self._updateJobInfo(data);
 			});
 		});
@@ -212,12 +210,10 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 
 	var self = this;
 	var elm_jobTitle = self._elmts.extJobTitle;
-	var elm_fields = self._elmts.extJobFields;
 	var elm_jobInstructions = self._elmts.extJobInstructions;
 	var elm_cml = self._elmts.extCml;
-	
-	console.log("Updating job..." + JSON.stringify(data));
-	
+
+	console.log("... updating job info");
 	if(data["title"] === null || data["title"] === "" ) {
 		elm_jobTitle.val("(title undefined)");
 	} else {
@@ -237,14 +233,70 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 		elm_cml.html(data["cml"]);
 	}
 	
-	//TODO: test this
 	if(data["fields"].length > 0) {
-		this._elmts.extFieldsPanel.show();
-		this._elmts.extColumnsPanel.hide();
-		var elm_fields = this._elmts.extJobFields;
-		$.each(data["fields"], function(index, value) {
-			$('<input type="checkbox">' + value + '</input>').appendTo(elm_fields);
+		console.log("Job has fields");
+		self._elmts.extFieldsPanel.show();
+		self._elmts.extColumnsPanel.hide();
+		var elm_fields = self._elmts.extJobFields;
+		elm_fields.empty();
+		
+		var columnDialog = $('<div id="columns-dialog" title="Test"></div>');
+		$('<div id="col-container"></div>').appendTo(columnDialog);
+		var columnListContainer = $('<div id="col-list-container"></div>').appendTo(columnDialog);
+
+		console.log("Rendering columns....");
+		var columns = theProject.columnModel.columns;
+		
+		$.each(columns, function(index, value){
+			$('<input type="radio" name="columns" class="zem-col" value="' + value.name + '">' + value.name + '</input>').appendTo(columnListContainer);					
 		});
+		
+		var column_name = "";
+		var field_name = "";
+		
+		
+		columnDialog.dialog({
+		
+				autoOpen: false,
+				modal: true,
+				closeOnEscape: true,
+				buttons: {
+					"Map": function() {
+						column_name = $('input[name=columns]:checked').val();
+						console.log("Column name: " + column_name);
+						//add mapped
+						
+						//TODO: check if exists, then just change the mapping, otherwise add it
+						
+						var fc = {};
+						console.log("Field name: " + $(this).data('fieldName'));
+						fc.field = columnDialog.data('fieldName');
+						fc.column = column_name;
+						
+						self._mappedFields.push(fc);
+						//update some list or something
+						console.log(JSON.stringify("Mappings! " + JSON.stringify(self._mappedFields)));
+						$(this).dialog('close'); 
+					},
+					Cancel: function () {
+						$(this).dialog('close'); 
+					}
+				},
+		});
+					
+		
+		$.each(data["fields"], function(index, value) {
+			var link = $('<a title="' + value + '" href="#">' + value + '</a><br/>').appendTo(elm_fields);
+		
+			link.click (function(){
+				console.log("Link text: " + $(this).text());
+				columnDialog.data('fieldName', $(this).text()).dialog("open");
+
+			});
+		
+		});
+				
+		
 	} else {
 		this._elmts.extFieldsPanel.hide();
 		this._elmts.extColumnsPanel.show();
@@ -257,7 +309,7 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 
 ZemantaCrowdFlowerDialog.prototype._renderAllColumns2 = function(columnContainer, columnListContainer, tabindex) {
 	  
-	var self = this;
+	//var self = this;
 	var columns = theProject.columnModel.columns;
 	
 	var chkid = 0;
@@ -299,6 +351,7 @@ ZemantaCrowdFlowerDialog.prototype._renderAllColumns2 = function(columnContainer
 };
 
 
+//TODO: remove this
 ZemantaCrowdFlowerDialog.prototype._renderAllColumns = function() {
 	  
 	var self = this;

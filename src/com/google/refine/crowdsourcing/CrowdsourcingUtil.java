@@ -28,9 +28,10 @@ public class CrowdsourcingUtil {
         Matcher regexMatcher = regex.matcher(cml);
         while (regexMatcher.find()) 
         {
-          field_names.add(regexMatcher.group());
-        } 
-            
+            if(!field_names.contains(regexMatcher.group())) {
+                field_names.add(regexMatcher.group());
+            } 
+        }           
         return field_names;
     }
     

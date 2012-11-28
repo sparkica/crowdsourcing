@@ -154,14 +154,11 @@ public class CopyJobCommand extends Command{
     private void generateResponse(HttpServletResponse response, JSONObject data)
             throws IOException, JSONException {
 
-        System.out.println("Data in generate response: \n" + data.toString());
-        
         
         Writer w = response.getWriter();
         JSONWriter writer = new JSONWriter(w);
         try {
            
-            System.out.println("MAIN object");
             writer.object();
             writer.key("status"); writer.value(data.get("status"));
             writer.key("job_id"); writer.value(data.get("job_id"));
@@ -170,14 +167,10 @@ public class CopyJobCommand extends Command{
             
                 writer.key("jobs"); 
                 writer.array();
-                System.out.println("Data has jobs, starting array.");
-
                 JSONArray jobs_updated = data.getJSONArray("jobs");
                 
                 for(int i=0; i < jobs_updated.length(); i++) {
                     JSONObject current = jobs_updated.getJSONObject(i);
-                    System.out.println("Object id: " + current.getString("id"));
-                    
                     writer.object();
                     writer.key("id").value(current.get("id"));
                     writer.key("title");
@@ -188,11 +181,9 @@ public class CopyJobCommand extends Command{
                         writer.value("No title entered yet");
                     }
                     writer.endObject();
-                    System.out.println("End object");
                 }
                 writer.endArray();
-                System.out.println("Closed array");
-            }
+        }
 
         } catch(Exception e){
             logger.error("Generating response failed.");
@@ -200,7 +191,6 @@ public class CopyJobCommand extends Command{
         finally {
             
             writer.endObject();
-            System.out.println("Closing MAIN object");
             w.flush();
             w.close();
         }
