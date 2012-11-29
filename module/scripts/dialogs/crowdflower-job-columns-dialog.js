@@ -54,13 +54,19 @@ function ZemantaCrowdFlowerDialog(onDone) {
 		  console.log("Uploading to existing job...");
 	  }
       
-	  //TODO: it depends on which tab is selected!!!
-      $('#project-columns-' + tabindex +' input.zem-col:checked').each( function() {
-    	  var col = {};
-    	  col.name = $(this).attr('value');
-    	  col.safe_name = ZemantaExtension.util.convert2SafeName(col.name);
-    	  self._extension.column_names.push(col);
-      });
+	  //TODO: it depends on which tab is selected and if job already has fields defined!!!
+	  if(tabindex === 0) {
+	      $('#project-columns-' + tabindex +' input.zem-col:checked').each( function() {
+	    	  var col = {};
+	    	  col.name = $(this).attr('value');
+	    	  col.safe_name = ZemantaExtension.util.convert2SafeName(col.name);
+	    	  self._extension.column_names.push(col);
+	      });
+	  } else {
+		  //if fields exist, then take those, check for mappings
+		  
+		  //else take column names
+	  }
       
       if(self._extension.column_names.length < 1) {
     	  alert("No column was selected! Cannot upload data.");
@@ -181,9 +187,14 @@ ZemantaCrowdFlowerDialog.prototype._renderAllExistingJobs = function() {
 	
 	$('<option name="opt_none" value="none">--- select a job --- </option>').appendTo(selContainer);
 	
+	
+	
 	ZemantaExtension.util.loadAllExistingJobs(function(data, status) {
 		
 		elemStatus.html("Status: " + status);
+	
+		//TODO: remove this
+		data = [{"job_id":"1","title":"test1"}];
 		
 		$.each(data, function(index, value) {
 			
@@ -214,6 +225,14 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 	var elm_cml = self._elmts.extCml;
 
 	console.log("... updating job info");
+	var status = data["status"];
+	
+	if(status === "ERROR") {
+		self._elmts.statusMessage.html(status + ': ' + data["message"]);
+	} else {
+		self._elmts.statusMessage.html(status);
+	}
+	
 	if(data["title"] === null || data["title"] === "" ) {
 		elm_jobTitle.val("(title undefined)");
 	} else {
@@ -233,13 +252,19 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 		elm_cml.html(data["cml"]);
 	}
 	
+	//TODO: remove this
+	data["fields"] = ["test_field1","test_field2"];
+	//data["fields"] = [];
+	
 	if(data["fields"].length > 0) {
 		console.log("Job has fields");
 		self._elmts.extFieldsPanel.show();
 		self._elmts.extColumnsPanel.hide();
 		var elm_fields = self._elmts.extJobFields;
 		elm_fields.empty();
-		
+
+		//TODO: move code for dialog out of this code - to the main dialog instead
+		//OR use same thing freebase is using for dialog
 		var columnDialog = $('<div id="columns-dialog" title="Test"></div>');
 		$('<div id="col-container"></div>').appendTo(columnDialog);
 		var columnListContainer = $('<div id="col-list-container"></div>').appendTo(columnDialog);
@@ -248,12 +273,8 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 		var columns = theProject.columnModel.columns;
 		
 		$.each(columns, function(index, value){
-			$('<input type="radio" name="columns" class="zem-col" value="' + value.name + '">' + value.name + '</input>').appendTo(columnListContainer);					
+			$('<input type="radio" name="columns" class="zem-col" value="' + value.name + '">' + value.name + '</input><br/>').appendTo(columnListContainer);					
 		});
-		
-		var column_name = "";
-		var field_name = "";
-		
 		
 		columnDialog.dialog({
 		
@@ -262,16 +283,11 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 				closeOnEscape: true,
 				buttons: {
 					"Map": function() {
-						column_name = $('input[name=columns]:checked').val();
-						console.log("Column name: " + column_name);
-						//add mapped
-						
-						//TODO: check if exists, then just change the mapping, otherwise add it
-						
+						var fname = columnDialog.data('fieldName');
 						var fc = {};
 						console.log("Field name: " + $(this).data('fieldName'));
 						fc.field = columnDialog.data('fieldName');
-						fc.column = column_name;
+						fc.column = $('input[name=columns]:checked').val();
 						
 						self._mappedFields.push(fc);
 						//update some list or something
@@ -286,24 +302,26 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 					
 		
 		$.each(data["fields"], function(index, value) {
-			var link = $('<a title="' + value + '" href="#">' + value + '</a><br/>').appendTo(elm_fields);
+			var link = $('<a title="' + value + '" href="javascript:{}">' + value + '</a><br/>').appendTo(elm_fields);
 		
 			link.click (function(){
 				console.log("Link text: " + $(this).text());
-				columnDialog.data('fieldName', $(this).text()).dialog("open");
-
-			});
-		
-		});
 				
-		
+				//TODO: add existing mapping
+				ZemantaCrowdFlowerDialog.showColumnsDialog($(this).text(),"Anchor", function(newMapping) {
+					//update mapping
+					console.log("New mapping: " + newMapping);
+				});
+				//columnDialog.data('fieldName', $(this).text()).dialog("open");
+			});		
+		});		
 	} else {
-		this._elmts.extFieldsPanel.hide();
+		self._elmts.extFieldsPanel.hide();
+		var tabindex = 1;
+		self._renderAllColumns2(self._elmts.columnsMenu_1, self._elmts.columnList_1, tabindex);
 		this._elmts.extColumnsPanel.show();
 	}
 	
-	
-	self._elmts.statusMessage.html(data["message"]);
 	
 };
 
@@ -351,47 +369,53 @@ ZemantaCrowdFlowerDialog.prototype._renderAllColumns2 = function(columnContainer
 };
 
 
-//TODO: remove this
-ZemantaCrowdFlowerDialog.prototype._renderAllColumns = function() {
+ZemantaCrowdFlowerDialog.showColumnsDialog = function(field, mapped_col, onDone) {
+	
+	var frame = DialogSystem.createDialog();
+	  frame.width("500px");
+
+	  var header = $('<div></div>').addClass("dialog-header").text("Add mapping for field: " + field).appendTo(frame);
+	  var body = $('<div></div>').addClass("dialog-body").appendTo(frame);
+	  var footer = $('<div></div>').addClass("dialog-footer").appendTo(frame);
+
+	  var columns = theProject.columnModel.columns;
 	  
-	var self = this;
-	var columns = theProject.columnModel.columns;
-	
-	var columnContainer = self._elmts.allColumns;
-	var columnListContainer = self._elmts.columnList;
-	var chkid = 0;
-
-	var renderColumns = function(columns, elem) {
+	  body.html(
+			  '<div class="grid-layout layout-normal layout-full">' +
+			 '<div id="columns" bind="projColumns" class="project-columns"></div>' +
+			 '</div>'
+	  );
+	  
+	  var bodyElmts = DOM.bind(body);
+	  $.each(columns, function(index, value){
 		
-		$.each(columns, function(index, value){
-			var id = 'chk_' + chkid;
-			var input = $('<input type="checkbox" class="zem-col" value="' + value.name + '" id="' + id + '"/>').appendTo(elem);
-			$('<label for="' + id + '">' + value.name + '</label> <br/>').appendTo(elem);
-			chkid++;
-						
-			input.click(function() {
-				$('#cmlPreviewPanel').html(ZemantaExtension.util.generateCML());
-			});
-		});
-	};
-	
-	var linkSelectAll = $('<a href="#" id="select-all-cols"> Select all </a>').appendTo(columnContainer);
-	var linkClearAll = $('<a href="#" id="clear-all-columns"> Clear all </a>').appendTo(columnContainer);
+		  var input = $('<input type="radio" name="columns" class="zem-col" value="' + value.name + '">' + value.name + '</input><br/>').appendTo(bodyElmts.projColumns);					
+		  if(value.name === mapped_col) {
+			  input.attr("checked","true");
+		  }
 
-	renderColumns(columns, columnListContainer);
+	  });
+
+	  footer.html(
+			    '<button class="button" bind="okButton">&nbsp;&nbsp;OK&nbsp;&nbsp;</button>' +
+			    '<button class="button" bind="cancelButton">Cancel</button>'
+			  );
+	  var footerElmts = DOM.bind(footer);
+
+	  var level = DialogSystem.showDialog(frame);
+	  var dismiss = function() {
+	    DialogSystem.dismissUntil(level - 1);
+	  };
+
+	  footerElmts.cancelButton.click(dismiss);
+	  footerElmts.okButton.click(function() {
+		  console.log("Column selected:" + $('input[name=columns]:checked').val());
+		  mapped_col = $('input[name=columns]:checked').val();
+		  onDone(mapped_col);
+		  
+		  dismiss();
+	  });
+			 	  
 	
-	linkClearAll.click(function () {
-		$('#project-columns input.zem-col').each(function () {
-			$(this).attr('checked', false);
-		});
-		$('#cmlPreviewPanel').html(ZemantaExtension.util.generateCML());
-	});
-	
-	linkSelectAll.click(function() {
-		$('#project-columns input.zem-col').each(function () {
-			$(this).attr('checked', true);
-		});
-		$('#cmlPreviewPanel').html(ZemantaExtension.util.generateCML());
-	});
 };
 

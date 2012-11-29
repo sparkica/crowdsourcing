@@ -69,7 +69,6 @@ public class CreateNewJobCommand extends Command{
             }
             else {
                 if(extension.has("id")) {
-                    job.put("status", "OK - existing job");
                     job.put("job_id", extension.getString("id"));
                 }
                 //ERROR

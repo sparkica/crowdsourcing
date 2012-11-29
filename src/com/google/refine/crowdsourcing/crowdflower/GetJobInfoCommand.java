@@ -49,28 +49,25 @@ public class GetJobInfoCommand extends Command{
                 if(res.getString("status").equals("ERROR"))
                 {
                     generateErrorResponse(response, res);
-                }
+                } else {
                      
-                JSONObject obj = res.getJSONObject("response");
-                obj.put("status", "OK"); //TODO: return additional message form API if there is any
-                generateResponse(response, obj);
-               
+                    JSONObject obj = res.getJSONObject("response");
+                    obj.put("status", "OK"); //TODO: return additional message form API if there is any
+                    generateResponse(response, obj);
+                }
             } else {
                 
                 JSONObject err = new JSONObject();
                 err.put("status", "ERROR");
-                err.put("message", "Job id was not provided. could not obtain job information.");
-                    
-                    generateErrorResponse(response, err);
-                }
+                err.put("message", "Job id was not provided. could not obtain job information.");    
+                generateErrorResponse(response, err);
+            }
             
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } 
-        
+        }      
     }
-
 
     
     private void generateResponse(HttpServletResponse response, JSONObject data)
