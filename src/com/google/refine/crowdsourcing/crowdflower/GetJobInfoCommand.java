@@ -78,12 +78,12 @@ public class GetJobInfoCommand extends Command{
             writer.object();
             writer.key("status"); writer.value(data.getString("status"));
             
-            writer.key("title"); writer.value(data.getString("title"));
-            writer.key("instructions"); writer.value(data.getString("instructions"));
-
+            writer.key("title"); writer.value(data.get("title"));
+            writer.key("instructions"); writer.value(data.get("instructions"));
+            writer.key("units_count");writer.value(data.get("units_count"));
             String cml = data.getString("cml");
             ArrayList<String> fields = new ArrayList<String>();
-            fields = CrowdsourcingUtil.parseCmlFields(data.getString("cml"));
+            fields = CrowdsourcingUtil.parseCmlFields(cml);
             
             writer.key("cml"); writer.value(cml);
             writer.key("fields").array();

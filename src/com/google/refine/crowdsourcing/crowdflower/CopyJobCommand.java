@@ -48,9 +48,18 @@ public class CopyJobCommand extends Command{
             } 
             else {
             
+                System.out.println("Job copied, updating list.");
+                //TODO: pause a little?
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 JSONObject obj = getUpdatedJobList(cf_client);
                 
                 if(obj.has("status") && obj.getString("status").equals("ERROR"))  {
+                    obj.put("source", "[updating job list]");
                     generateErrorResponse(response, obj);
                 } 
                 else {
@@ -205,11 +214,19 @@ public class CopyJobCommand extends Command{
             writer.key("status"); writer.value(data.get("status"));
             writer.key("message");
             
+            String error_msg = "";
+            
             if(data.has("error")) {
-                writer.value(data.getJSONObject("error").getString("message"));
+                error_msg = data.getJSONObject("error").getString("message");
             } else {
-                writer.value(data.getString("message"));
+                error_msg = data.getString("message");
             }
+            
+            if(data.has("source")) {
+                error_msg += " -- error source: " + data.getString("source");
+            }
+            
+            writer.value(error_msg);
             
         } catch(Exception e){
             logger.error("Generating ERROR response failed.");

@@ -57,11 +57,11 @@
     <div class="column-right" id="copy-job-options">
     	<h3>Copy job with units:</h3>
     	<div class="field_container">
-		  	<input type="radio" name="units" value="copy-none" bind="copyJob" checked="true"><span style="color:#7E2217; font-weight:bold; ">none</span> </input>
-		  	<input type="radio" name="units" value="copy-all" bind="copyJobGoldUnits"> <span style="color:#4AA02C; font-weight: bold;">all</span></input>
-		  	<input type="radio" name="units" value="copy-gold" bind="copyJobGoldUnits"> <span style="color:#EAC117; font-weight: bold;">gold</span> only </input>
+		  	<input type="radio" name="units" value="none" bind="copyJob" checked="true"><span style="color:#7E2217; font-weight:bold; ">none</span> </input>
+		  	<input type="radio" name="units" value="all_units" bind="copyJobGoldUnits"> <span style="color:#4AA02C; font-weight: bold;">all</span></input>
+		  	<input type="radio" name="units" value="gold" bind="copyJobGoldUnits"> <span style="color:#EAC117; font-weight: bold;">gold</span> only </input>
+		&nbsp; &nbsp;<input class="button" type="button" value="Copy into new job" bind="copyJobButton"/>
 		</div>
-		<input class="button" type="button" value="Copy into new job" bind="copyJobButton"/>		
     </div>	
     	</div>
     	
@@ -80,7 +80,10 @@
 			</div>
 	   	</div>
 	   	<div class="column-right">
-	   		
+	   		<div class="field_container">
+	   		<label>Units: </label>
+	   		<span bind="extUnitsCount" id="units-count"></span><br/>
+	   		</div>
 			<div class="field_container">
 			<label>Existing CML: </label>
 			<textarea bind="extCml" class="job-instructions"></textarea>

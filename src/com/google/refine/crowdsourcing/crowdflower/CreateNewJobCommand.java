@@ -54,12 +54,13 @@ public class CreateNewJobCommand extends Command{
             response.setCharacterEncoding("UTF-8");
             response.setHeader("Content-Type", "application/json");
             
-            String job_title = extension.getString("title");
-            String job_instructions = extension.getString("instructions");
             JSONObject job = new JSONObject();
             JSONObject result = new JSONObject();
             
             if(extension.has("new_job") && extension.getBoolean("new_job")) {
+                String job_title = extension.getString("title");
+                String job_instructions = extension.getString("instructions");
+
                 //new empty job with title and instructions
                 job = createNewEmptyJob(cf_client, job_title, job_instructions);
                 
@@ -68,8 +69,8 @@ public class CreateNewJobCommand extends Command{
                 }
             }
             else {
-                if(extension.has("id")) {
-                    job.put("job_id", extension.getString("id"));
+                if(extension.has("job_id")) {
+                    job.put("job_id", extension.getString("job_id"));
                 }
                 //ERROR
                 else { 
@@ -89,7 +90,7 @@ public class CreateNewJobCommand extends Command{
                 if(extension.getBoolean("upload")) {
                     
                     System.out.println("Generating objects for upload....");
-                    StringBuffer data = generateObjectForUpload(extension, project, engine);             
+                    StringBuffer data = generateObjectsForUpload(extension, project, engine);             
                     String msg = cf_client.bulkUploadJSONToExistingJob(job.getString("job_id"), data.toString());
                     JSONObject obj = ParsingUtilities.evaluateJsonStringToObject(msg);
                     
@@ -98,7 +99,7 @@ public class CreateNewJobCommand extends Command{
                     if(obj.has("response") && !obj.isNull("response")) {
                         //upload succeeded
                         JSONObject rspn = obj.getJSONObject("response");
-                        result.put("job_id", rspn.get("id"));
+                        result.put("job_id", rspn.get("id"));                        
                         generateResponse(response, result);
                     } else {
                         result.put("message", obj.get("message"));
@@ -152,9 +153,12 @@ public class CreateNewJobCommand extends Command{
     }
 
 
-    private StringBuffer generateObjectForUpload(JSONObject extension, Project project, Engine engine)
+    private StringBuffer generateObjectsForUpload(JSONObject extension, Project project, Engine engine)
             throws JSONException {
         _cell_indeces = new ArrayList<Integer>();
+        
+        //TODO: if it is an existing job with existing data!, get field-column mappings
+        
         JSONArray column_names = extension.getJSONArray("column_names"); 
             
         for (int i=0; i < column_names.length(); i++) {
@@ -211,6 +215,8 @@ public class CreateNewJobCommand extends Command{
             JSONObject obj =  new JSONObject();
             for (int c=0; c < column_names.length(); c++) {
                 int cell_index = _cell_indeces.get(c);
+                
+                //TODO: if job already has data, can we use safe_name to pass field?
                 String key = column_names.getJSONObject(c).getString("safe_name");
                 Object value = project.rows.get(row_index).getCellValue(cell_index);
                 
