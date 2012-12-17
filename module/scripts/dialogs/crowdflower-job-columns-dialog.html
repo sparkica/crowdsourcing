@@ -9,11 +9,40 @@
     	<li><a href="#existing-job-tab">Upload to existing job</a></li>
     </ul>
     <div class="panels-area">
+    
     <div id="new-job-tab" bind="newJobTab">
- 	<div>   	
-		<div class="job-box">
-		  <h2>New job details</h2>
+ 	<div>
+	<div class="job-box">
+		<a href="javascript:{}" class="link-menu" id="create-from-template" bind="createFromTemplate">Create from template</a> 
+	</div>		
+ 	<div class="job-box" id="job-template-panel" bind="jobTemplatePanel">
+		  <div class="field_container">
+		  	<label>Entity type:</label>
+			<input id="autocomplete" bind="entityType"/>
+			<span id="title-warning" class="warning">E.g.: player, athlete, person, movie, TV series</span>
+			</div>		
 		  
+		  <div class="field_container">
+		  <label>Template:</label>
+    		<select id="job-templates" bind="jobTemplates">
+    		<option id="blank" value="blank">--- no template ---</option>
+    		<option id="freebase" value="freebase">Freebase reconciliation</option>
+    		<option id="dbpedia" value="dbpedia" >DBpedia reconciliation</option>
+    		</select>
+    		<span id="title-warning" class="warning">Choose one of templates or enter your data in New job details</span>	    		
+		</div>
+		<div><input type="button" value="Load template" bind="buttonLoadTemplate" class="button"></div>
+	</div>
+	
+	<div class="job-box">
+		<a href="javascript:{}" class="link-menu" id="create-from-blank" bind="createFromBlank">Create new blank job</a> 
+	</div>	
+		
+ 	   	
+		<div class="job-box" bind="newJobDetailsPanel" id="new-job-details-panel">
+		
+		  <h2>New job details</h2>
+				  
 		  <div class="field_container">
 		  	<label>Title: </label><input bind="jobTitle" type="text" class="job-title" id="jobTitle" />
 		  	<span id="title-warning" class="warning">Job title should be 5-255 characters long.</span>
@@ -22,10 +51,13 @@
 		 	<label>Instructions: </label><textarea bind="jobInstructions" class="job-instructions"></textarea>
 		 	<span id="instructions-warning" class="warning">Instructions should not be empty.</span>
 		 </div>
+		 <div id="job-problem" bind="jobProblem"></div>
+		 
 		 <div class="field_container">
 		 	<label>Upload data: </label><input type="checkbox" bind="chkUploadToNewJob"/>
 		 </div>
-		</div>  		  
+		</div>  
+				  
 		<div id="columns" bind="columnsPanel" class="job-box wrapper">
 			<div class="column-left">
 			<h3>Columns to upload (scroll right for more) </h3>

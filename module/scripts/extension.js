@@ -92,19 +92,15 @@ ExtensionBar.addExtensionMenu({
 			 "label": "OpenRefine settings",
 			 click: ZemantaExtension.handlers.openPreferences
 		 },
+		 {},
 		 {
 			 "id" : "zemanta/crowdflower",
-			 "label" : "CrowdFlower service",
+			 "label" : "CrowdFlower",
 			 "submenu" : [
 				    		 {
 				    			 "id": "zemanta/crowdflower/create-crowdflower-job",
 				    			 label: "Create new job / upload data",
 				    			 click: ZemantaExtension.handlers.openJobSettingsDialog
-				    		 },
-				    		 {
-				    			 "id": "zemanta/crowdflower/configure-job",
-				    			 "label" :  "Configure job",
-				    			 click: ZemantaExtension.handlers.doNothing 
 				    		 },
 				    		 {
 				    			"id": "zemanta/crowdflower/download-results",
@@ -113,31 +109,29 @@ ExtensionBar.addExtensionMenu({
 				    			 
 				    		 },
 				    		 {},
-
-			     		 {
-			    			 "id": "zemanta/crowdflower/settings",
-			    			 "label": "Set CrowdFlower API key",
-			    			 click: ZemantaExtension.handlers.storeCrowdFlowerAPIKey
-			    		 },
+				    		 {
+				    			 "id": "zemanta/crowdflower/templates",
+				    			 label: "Templates",
+				    			 "submenu": [
+				    			             {
+				    			            	 "id":"zemanta/crowdflower/templates/freebase",
+				    			            	 "label": "Evaluate Freebase reconciliations",
+				    			            	 click: ZemantaExtension.handlers.evaluateFreebaseReconDialog
+				    			             },
+				    			             {
+				    			            	 "id":"zemanta/crowdflower/templates/dbpedia",
+				    			            	 "label": "Evaluate DBpedia reconciliations",
+				    			            	 click: ZemantaExtension.handlers.doNothing
+				    			             }
+				    			             ]
+				    		 },
+				    		 {},
+				     		 {
+				    			 "id": "zemanta/crowdflower/settings",
+				    			 "label": "Settings",
+				    			  click: ZemantaExtension.handlers.storeCrowdFlowerAPIKey
+				    		 },
 			              ]
-		 },
-		 {},
-		 {
-			 "id": "zemanta/crowdflowertemplates",
-			 label: "CrowdFlower - job templates",
-			 "submenu": [
-			             {
-			            	 "id":"zemanta/crowdflowertemplates/freebase",
-			            	 "label": "Evaluate Freebase reconciliations",
-			            	 click: ZemantaExtension.handlers.evaluateFreebaseReconDialog
-			             },
-			             {
-			            	 "id":"zemanta/crowdflowertemplates/dbpedia",
-			            	 "label": "Evaluate DBpedia reconciliations",
-			            	 click: ZemantaExtension.handlers.doNothing
-			             }
-			             ]
 		 }
-		 
 		]
 });

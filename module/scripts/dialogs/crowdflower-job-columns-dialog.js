@@ -24,6 +24,25 @@ function ZemantaCrowdFlowerDialog(onDone) {
   
   this._elmts.extFieldsPanel.hide();
   this._elmts.extColumnsPanel.hide();
+  this._elmts.jobTemplatePanel.hide();
+  
+  this._elmts.createFromTemplate.click(function () {
+	  
+	  $('#autocomplete').autocomplete({
+		  source: ["NHL player", "player", "movie", "show", "person", "product"]
+	  });
+	  
+	  self._elmts.jobTemplatePanel.show();  
+  });
+
+  this._elmts.createFromBlank.click(function () {
+	  
+	  self._elmts.jobTemplatePanel.hide();
+	  
+	  self._elmts.newJobDetailsPanel.show();  
+  });
+
+  
   
   this._elmts.chkUploadToNewJob.click(function () {
 	
@@ -35,6 +54,11 @@ function ZemantaCrowdFlowerDialog(onDone) {
 	  }
 	  
   });
+ 
+  this._elmts.buttonLoadTemplate.click(function () {
+		 self._updateFieldsFromTemplate(self._elmts.entityType.val());
+  });
+  
   
   this._elmts.okButton.click(function() {
 	  self._extension = {};
@@ -46,7 +70,6 @@ function ZemantaCrowdFlowerDialog(onDone) {
 	  var curTabPanel = $('#jobTabs .ui-tabs-panel:not(.ui-tabs-hide)');	  
 	  var tabindex = curTabPanel.index();
 
-	  //TODO: it depends on which tab is selected and if job already has fields defined!!!
 	  if(tabindex === 0) {
 		  self._extension.new_job = true;  
 		  console.log("Creating new job...");
@@ -59,7 +82,6 @@ function ZemantaCrowdFlowerDialog(onDone) {
 	      });
 	  } else {
 		  self._extension.new_job = false;
-		  //TODO: add job id
 		  self._extension.job_id =  self._elmts.allJobsList.children(":selected").val();
 		  console.log("Uploading to existing job...: " + self._extension.job_id);
 
@@ -221,9 +243,6 @@ ZemantaCrowdFlowerDialog.prototype._renderAllExistingJobs = function() {
 		
 		elemStatus.html("Status: " + status);
 	
-		//TODO: remove this
-		//data = [{"job_id":"1","title":"test1"}];
-		
 		$.each(data, function(index, value) {
 			
 			var title = (value.title == null)? "Title not defined" : value.title;
@@ -408,7 +427,7 @@ ZemantaCrowdFlowerDialog.prototype._renderMappings = function() {
 	elm_fields.empty();
 
 	console.log("Rendering mappings...");
-	//TODO: if initial render, there is data from response, otherwise store it somewhere
+
 	$.each(self._fields, function(index, value) {
 		var link = $('<a title="' + value + '" href="javascript:{}">' + value + '</a>').appendTo(elm_fields);
 		$('<span>&nbsp;&nbsp;=&gt;&nbsp;&nbsp;</span>').appendTo(elm_fields);
@@ -457,3 +476,77 @@ ZemantaCrowdFlowerDialog.prototype._getMappedColumn = function (field) {
 	return column;
 };
 
+
+ZemantaCrowdFlowerDialog.prototype._updateFieldsFromTemplate = function (entityType) {
+	
+	var self = this;
+	var title = "";
+	var instructions = "";
+	var cml = "";
+	var recon = "";
+	var reconSearchUrl = "";
+	
+	//get selected template
+	var template = self._elmts.jobTemplates.children(":selected").val();
+	
+	console.log("Entity type: " + entityType);
+	
+	if(template === "blank") {
+		alert("Choose template first.");
+		return;
+	}
+	
+	if(template === "freebase") {
+		recon = "Freebase";
+		reconSearchUlr = "http://www.freebase.com/view";
+		
+	}
+	else if(template === "dbpedia") {
+		recon = "DBpedia";
+		reconSearchUrl = "http://dbpedia.org/fct/";
+
+	}
+	
+	
+	title = "Find " + recon + " profile page for " + entityType;
+	instructions = "Find Freebase page for "+ entityType +" which matches data on " + entityType + "'s profile page.";
+	instructions += "<b>Check suggested options FIRST</b>. If none of them matches, try to find profile page ";
+	instructions += "using <a target=\"_blank\" href=\""+ reconSearchUrl + "\">"+ recon + " search page</a>. ";
+
+	cml = "<p>" + 
+	  entityType + ":&#xA0;" +
+	  "{{anchor}}<br />" + entityType + "'s profile page:&#xA0;<a href=\"{{link}}\" target=\"_blank\" id=\"\">" +
+	  "{{link}}</a><br />" +
+	  "<hr />" +
+	  "<p>&#xA0;<b>FIRST</b> check suggested links:</p>" +
+		"<ol type=\"1\">" + 
+		"<li>Suggestion 1: <a href=\"{{suggestion_url_1}}\" target=\"_blank\">" + 
+		"{{suggestion_name_1}}</a></li>" + 
+		"<li>Suggestion 2: <a href=\"{{suggestion_url_2}}\" target=\"_blank\">" + 
+		"{{suggestion_name_2}}</a></li>" +
+		"<li>Suggestion 3: <a href=\"{{suggestion_url_3}}\" target=\"_blank\">" +
+		"{{suggestion_name_3}}</a></li>" + 
+		"<li>None of the above matches (<a target=\"_blank\" href=\""+ reconSearchUrl + "\">find page on your own</a>)</li>" +
+		"</ol>" + 
+		"<cml:select label=\"Best suggestion\" validates=\"required\" gold=\"true\" instructions=\"Select the best option for this "+ entityType +".\">" +
+		"    <cml:option label=\"Suggestion 1\" value=\"Suggestion 1\"></cml:option>" +
+		"    <cml:option label=\"Suggestion 2\" value=\"Suggestion 2\"></cml:option>" +
+		"    <cml:option label=\"Suggestion 3\" value=\"Suggestion 3\"></cml:option>" +
+		"    <cml:option label=\"None of the above\" value=\"None of the above\"></cml:option>" +
+		"  </cml:select>" +
+"<cml:text label=\"Enter "+ recon + " link\" gold=\"true\" only-if=\"best_suggestion:[4]\" instructions=\"Find " + recon + " page for this " + entityType + " and paste it in this field\"  validates=\"url:['non-search']\">"  +
+"</cml:text>";
+	
+	
+	self._elmts.jobTitle.val(title);
+	self._elmts.jobInstructions.html(instructions);
+	
+	
+	console.log("Updating fields from template: " + template);
+	console.log("Generated CML\n" + cml);
+
+	
+	
+	
+	
+};
