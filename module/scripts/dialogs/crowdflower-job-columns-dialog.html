@@ -53,21 +53,15 @@
 		 </div>
 		 <div id="job-problem" bind="jobProblem"></div>
 		 
-		 <div class="field_container">
+		 <div class="field_container" id="data-upload" bind="dataUpload">
 		 	<label>Upload data: </label><input type="checkbox" bind="chkUploadToNewJob"/>
 		 </div>
 		</div>  
 				  
 		<div id="columns" bind="columnsPanel" class="job-box wrapper">
-			<div class="column-left">
 			<h3>Columns to upload (scroll right for more) </h3>
 			<div bind="columnsMenu_0" id="columns-menu-0"></div>
 			<div bind="columnList_0" id="project-columns-0" class="project-columns"></div>
-			</div>
-			<div class="column-right">
-			<h3>Generated default CML</h3>
-			<div bind="cmlPreviewPanel_0" id="cml-preview-panel-0"></div>
-			</div>
 		</div>
 	</div>
     </div>
@@ -116,13 +110,6 @@
 	   		<label>Units: </label>
 	   		<span bind="extUnitsCount" id="units-count"></span><br/>
 	   		</div>
-			<div class="field_container">
-			<label>Existing CML: </label>
-			<textarea bind="extCml" class="job-instructions"></textarea>
-			</div>
-			<div>
-			<a href="#">Edit CML at CrowdFlower site.</a>
-			</div>
 		</div>
 		</div>
 	</div>

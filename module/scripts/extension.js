@@ -1,14 +1,14 @@
 var ZemantaExtension = {handlers: {}, util: {}};
 
 
-ZemantaExtension.handlers.storeCrowdFlowerAPIKey = function() {
+ZemantaExtension.handlers.storeCrowdFlowerSettings = function() {
 	
-	new ZemantaSettingsDialog(function(newApiKey) {
+	new ZemantaSettingsDialog(function(newSettings) {
 		$.post(
 	          "/command/core/set-preference",
 	          {
 	            name : "crowdflower.apikey",
-	            value : JSON.stringify(newApiKey)
+	            value : JSON.stringify(newSettings.apiKey)
 	          },
 	          function(o) {
 	            if (o.code == "error") {
@@ -18,6 +18,20 @@ ZemantaExtension.handlers.storeCrowdFlowerAPIKey = function() {
 	          },
 	          "json"
 		);
+		$.post(
+		          "/command/core/set-preference",
+		          {
+		            name : "crowdflower.defaultTimeout",
+		            value : JSON.stringify(newSettings.defaultTimeout)
+		          },
+		          function(o) {
+		            if (o.code == "error") {
+		            	
+		            	alert(o.message);
+		            }
+		          },
+		          "json"
+			);
 	});
 };
 
@@ -129,7 +143,7 @@ ExtensionBar.addExtensionMenu({
 				     		 {
 				    			 "id": "zemanta/crowdflower/settings",
 				    			 "label": "Settings",
-				    			  click: ZemantaExtension.handlers.storeCrowdFlowerAPIKey
+				    			  click: ZemantaExtension.handlers.storeCrowdFlowerSettings
 				    		 },
 			              ]
 		 }

@@ -4,6 +4,7 @@ function ZemantaCrowdFlowerDialog(onDone) {
   this._extension = {};
   this._mappedFields = [];
   this._fields = [];
+  this._cml = "";
   var dismissBusy = DialogSystem.showBusy();
     
   this._dialog = $(DOM.loadHTML("crowdsourcing", "scripts/dialogs/crowdflower-job-columns-dialog.html"));
@@ -32,14 +33,19 @@ function ZemantaCrowdFlowerDialog(onDone) {
 		  source: ["NHL player", "player", "movie", "show", "person", "product"]
 	  });
 	  
-	  self._elmts.jobTemplatePanel.show();  
+	  self._elmts.dataUpload.hide();
+	  self._elmts.jobTemplatePanel.show();
+	  
   });
 
   this._elmts.createFromBlank.click(function () {
 	  
 	  self._elmts.jobTemplatePanel.hide();
-	  
-	  self._elmts.newJobDetailsPanel.show();  
+	  self._elmts.jobTitle.val("");
+	  self._elmts.jobInstructions.val("");
+	  self._elmts.dataUpload.show();
+	  self._elmts.newJobDetailsPanel.show();
+	  self._cml = "";
   });
 
   
@@ -69,10 +75,16 @@ function ZemantaCrowdFlowerDialog(onDone) {
       
 	  var curTabPanel = $('#jobTabs .ui-tabs-panel:not(.ui-tabs-hide)');	  
 	  var tabindex = curTabPanel.index();
+	  var uploadData = false;
 
 	  if(tabindex === 0) {
 		  self._extension.new_job = true;  
 		  console.log("Creating new job...");
+		  
+	      if(self._elmts.chkUploadToNewJob.is(':checked')) {
+	    	  uploadData = true;
+	      }
+
 
 	      $('#project-columns-' + tabindex +' input.zem-col:checked').each( function() {
 	    	  var col = {};
@@ -80,13 +92,20 @@ function ZemantaCrowdFlowerDialog(onDone) {
 	    	  col.safe_name = ZemantaExtension.util.convert2SafeName(col.name);
 	    	  self._extension.column_names.push(col);
 	      });
+	      
+	      //console.log("CML: " + self._cml + '\n');
+	      //self._extension.cml = self._cml;
+	      
+	      
+	      
 	  } else {
+		  console.log("Tabindex: " + tabindex);
 		  self._extension.new_job = false;
 		  self._extension.job_id =  self._elmts.allJobsList.children(":selected").val();
 		  console.log("Uploading to existing job...: " + self._extension.job_id);
-
 		  
 		  if(self._mappedFields.length > 0) {
+			  console.log("Mapped fields? Is this for templates?");
 			  $.each(self._mappedFields, function(index, value) {
 				  var col = {};
 		    	  col.name = value.column;
@@ -94,6 +113,7 @@ function ZemantaCrowdFlowerDialog(onDone) {
 		    	  self._extension.column_names.push(col);
 			  });
 		  } else {
+			  console.log("Adding other columns");
 			  $('#project-columns-' + tabindex +' input.zem-col:checked').each( function() {
 		    	  var col = {};
 		    	  col.name = $(this).attr('value');
@@ -101,17 +121,23 @@ function ZemantaCrowdFlowerDialog(onDone) {
 		    	  self._extension.column_names.push(col);
 		      });
 		  }		  
+		  
+		  if(self._extension.column_names.length > 0) {
+			  	uploadData = true;
+		  }
 	  }
       
-      if(self._extension.column_names.length < 1) {
-    	  alert("No column was selected! Cannot upload data.");
-      }
-      else {
+	  if(uploadData){	  	  
     	  self._extension.upload = true;
     	  console.log("Columns: " + JSON.stringify(self._extension.column_names));
-    	  DialogSystem.dismissUntil(self._level - 1);
-    	  self._onDone(self._extension);
-      }
+	  } else {
+    	  console.log("No data will be uploaded...");
+    	  self._extension.upload = false;
+	  }
+	  
+	  DialogSystem.dismissUntil(self._level - 1);
+	  self._onDone(self._extension);
+	  
   });
   
   
@@ -269,8 +295,7 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 	var self = this;
 	var elm_jobTitle = self._elmts.extJobTitle;
 	var elm_jobInstructions = self._elmts.extJobInstructions;
-	var elm_cml = self._elmts.extCml;
-
+	
 	//reset fields and mappings
 	self._fields = [];
 	self._mappedFields = [];
@@ -299,11 +324,6 @@ ZemantaCrowdFlowerDialog.prototype._updateJobInfo = function(data) {
 		
 		self._elmts.extUnitsCount.html(data["units_count"]);
 		
-		if(data["cml"] === "[]" || data["cml"] === null) {
-			elm_cml.html("(no cml defined )");
-		} else {
-			elm_cml.html(data["cml"]);
-		}
 		
 		if(data["fields"]!= null && data["fields"].length > 0) {
 			console.log("Job has fields");
@@ -333,13 +353,9 @@ ZemantaCrowdFlowerDialog.prototype._renderAllColumns2 = function(columnContainer
 		
 		$.each(columns, function(index, value){
 			var id = 'chk_' + tabindex + '_' + chkid;
-			var input = $('<input type="checkbox" class="zem-col" value="' + value.name + '" id="' + id + '"/>').appendTo(elem);
+			$('<input type="checkbox" class="zem-col" value="' + value.name + '" id="' + id + '"/>').appendTo(elem);
 			$('<label for="' + id + '">' + value.name + '</label> <br/>').appendTo(elem);
 			chkid++;
-						
-			input.click(function() {
-				$('#cml-preview-panel-' + tabindex).html(ZemantaExtension.util.generateCML(tabindex));
-			});
 		});
 	};
 	
@@ -354,14 +370,12 @@ ZemantaCrowdFlowerDialog.prototype._renderAllColumns2 = function(columnContainer
 		$('#project-columns-' + tabindex + ' input.zem-col').each(function () {
 			$(this).attr('checked', false);
 		});
-		$('#cml-preview-panel-' + tabindex).html(ZemantaExtension.util.generateCML(tabindex));
 	});
 	
 	linkSelectAll.click(function() {
 		$('#project-columns-'+ tabindex + ' input.zem-col').each(function () {
 			$(this).attr('checked', true);
 		});
-		$('#cml-preview-panel-' + tabindex).html(ZemantaExtension.util.generateCML(tabindex));
 	});
 };
 
@@ -372,7 +386,7 @@ ZemantaCrowdFlowerDialog.prototype._showColumnsDialog = function(field, mapped_c
 	var frame = DialogSystem.createDialog();
 	  frame.width("500px");
 
-	  var header = $('<div></div>').addClass("dialog-header").text("Add mapping for field: " + field).appendTo(frame);
+	  $('<div></div>').addClass("dialog-header").text("Add mapping for field: " + field).appendTo(frame);
 	  var body = $('<div></div>').addClass("dialog-body").appendTo(frame);
 	  var footer = $('<div></div>').addClass("dialog-footer").appendTo(frame);
 
@@ -490,6 +504,7 @@ ZemantaCrowdFlowerDialog.prototype._updateFieldsFromTemplate = function (entityT
 	var template = self._elmts.jobTemplates.children(":selected").val();
 	
 	console.log("Entity type: " + entityType);
+	console.log("Template: " + template);
 	
 	if(template === "blank") {
 		alert("Choose template first.");
@@ -509,14 +524,14 @@ ZemantaCrowdFlowerDialog.prototype._updateFieldsFromTemplate = function (entityT
 	
 	
 	title = "Find " + recon + " profile page for " + entityType;
-	instructions = "Find Freebase page for "+ entityType +" which matches data on " + entityType + "'s profile page.";
+	instructions = "Find " + recon + " page for "+ entityType +" which matches data on " + entityType + "'s profile page.";
 	instructions += "<b>Check suggested options FIRST</b>. If none of them matches, try to find profile page ";
 	instructions += "using <a target=\"_blank\" href=\""+ reconSearchUrl + "\">"+ recon + " search page</a>. ";
 
-	cml = "<p>" + 
+	self._cml = "<p>" + 
 	  entityType + ":&#xA0;" +
 	  "{{anchor}}<br />" + entityType + "'s profile page:&#xA0;<a href=\"{{link}}\" target=\"_blank\" id=\"\">" +
-	  "{{link}}</a><br />" +
+	  "{{link}}</a></p><br />" +
 	  "<hr />" +
 	  "<p>&#xA0;<b>FIRST</b> check suggested links:</p>" +
 		"<ol type=\"1\">" + 
@@ -539,12 +554,13 @@ ZemantaCrowdFlowerDialog.prototype._updateFieldsFromTemplate = function (entityT
 	
 	
 	self._elmts.jobTitle.val(title);
-	self._elmts.jobInstructions.html(instructions);
+	self._elmts.jobInstructions.val(instructions);
 	
 	
 	console.log("Updating fields from template: " + template);
 	console.log("Generated CML\n" + cml);
 
+	//todo: upload cml to created job 
 	
 	
 	

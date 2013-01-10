@@ -34,9 +34,12 @@ public class CopyJobCommand extends Command{
             String jsonString = request.getParameter("extension");
                         
             JSONObject extension = ParsingUtilities.evaluateJsonStringToObject(jsonString);
-            String apiKey = (String) CrowdsourcingUtil.getPreference("crowdflower.apikey");                       
-            CrowdFlowerClient cf_client = new CrowdFlowerClient(apiKey);
+            String apiKey = (String) CrowdsourcingUtil.getPreference("crowdflower.apikey"); 
+            Object defTimeout = CrowdsourcingUtil.getPreference("crowdflower.defaultTimeout");
+            String defaultTimeout = (defTimeout != null) ? (String)defTimeout : "1500";
             
+            CrowdFlowerClient cf_client = new CrowdFlowerClient(apiKey, Integer.valueOf(defaultTimeout));
+                     
             response.setCharacterEncoding("UTF-8");
             
             JSONObject result = new JSONObject(); 
