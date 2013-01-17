@@ -1,7 +1,7 @@
-var ZemantaExtension = {handlers: {}, util: {}};
+var ZemantaCrowdSourcingExtension = {handlers: {}, util: {}};
 
 
-ZemantaExtension.handlers.storeCrowdFlowerSettings = function() {
+ZemantaCrowdSourcingExtension.handlers.storeCrowdFlowerSettings = function() {
 	
 	new ZemantaSettingsDialog(function(newSettings) {
 		$.post(
@@ -36,15 +36,12 @@ ZemantaExtension.handlers.storeCrowdFlowerSettings = function() {
 };
 
 
-ZemantaExtension.handlers.doNothing = function() {
+ZemantaCrowdSourcingExtension.handlers.doNothing = function() {
 	alert("Crowdsourcing extension active...");
 };
 
-ZemantaExtension.handlers.openPreferences = function() {
-	window.location = "/preferences";
-};
 
-ZemantaExtension.handlers.openJobSettingsDialog = function()  {
+ZemantaCrowdSourcingExtension.handlers.openJobSettingsDialog = function()  {
 	
 	new ZemantaCrowdFlowerDialog(function(extension) {
 		
@@ -65,7 +62,7 @@ ZemantaExtension.handlers.openJobSettingsDialog = function()  {
 	});
 };
 
-ZemantaExtension.handlers.evaluateFreebaseReconDialog = function()  {
+ZemantaCrowdSourcingExtension.handlers.evaluateFreebaseReconDialog = function()  {
 	
 	new ZemantaCFEvaluateFreebaseReconDialog(function(extension) {
 		
@@ -88,9 +85,9 @@ ZemantaExtension.handlers.evaluateFreebaseReconDialog = function()  {
 
 
 
-ZemantaExtension.handlers.getApiKey =  function() {
+ZemantaCrowdSourcingExtension.handlers.getApiKey =  function() {
 	console.log("Getting API key...");
-	ZemantaExtension.util.loadCrowdFlowerApiKeyFromSettings(function(apiKey) {
+	ZemantaCrowdSourcingExtension.util.loadCrowdFlowerApiKeyFromSettings(function(apiKey) {
 		console.log("Read API key: " + apiKey);
 		return apiKey;
 	});
@@ -98,54 +95,37 @@ ZemantaExtension.handlers.getApiKey =  function() {
 
 
 ExtensionBar.addExtensionMenu({
-	"id": "zemanta",
-	"label": "Zemanta",
+	"id": "crowdsourcing-ext",
+	"label": "Crowdsourcing",
 	"submenu": [
-   		 {
-			 "id": "zemanta/openrefine-settings",
-			 "label": "OpenRefine settings",
-			 click: ZemantaExtension.handlers.openPreferences
-		 },
-		 {},
-		 {
-			 "id" : "zemanta/crowdflower",
-			 "label" : "CrowdFlower",
-			 "submenu" : [
 				    		 {
-				    			 "id": "zemanta/crowdflower/create-crowdflower-job",
+				    			 "id": "crowdsourcing-ext/create-crowdflower-job",
 				    			 label: "Create new job / upload data",
-				    			 click: ZemantaExtension.handlers.openJobSettingsDialog
-				    		 },
-				    		 {
-				    			"id": "zemanta/crowdflower/download-results",
-				    			"label": "Download results",
-				    			click: ZemantaExtension.handlers.doNothing
-				    			 
+				    			 click: ZemantaCrowdSourcingExtension.handlers.openJobSettingsDialog
 				    		 },
 				    		 {},
 				    		 {
-				    			 "id": "zemanta/crowdflower/templates",
-				    			 label: "Templates",
+				    			 "id": "crowdsourcing-ext/templates",
+				    			 label: "Job templates",
 				    			 "submenu": [
 				    			             {
-				    			            	 "id":"zemanta/crowdflower/templates/freebase",
+				    			            	 "id":"crowdsourcing-ext/templates/freebase",
 				    			            	 "label": "Evaluate Freebase reconciliations",
-				    			            	 click: ZemantaExtension.handlers.evaluateFreebaseReconDialog
+				    			            	 click: ZemantaCrowdSourcingExtension.handlers.evaluateFreebaseReconDialog
 				    			             },
 				    			             {
-				    			            	 "id":"zemanta/crowdflower/templates/dbpedia",
+				    			            	 "id":"crowdsourcing-ext/templates/dbpedia",
 				    			            	 "label": "Evaluate DBpedia reconciliations",
-				    			            	 click: ZemantaExtension.handlers.doNothing
+				    			            	 click: ZemantaCrowdSourcingExtension.handlers.doNothing
 				    			             }
 				    			             ]
 				    		 },
 				    		 {},
 				     		 {
-				    			 "id": "zemanta/crowdflower/settings",
-				    			 "label": "Settings",
-				    			  click: ZemantaExtension.handlers.storeCrowdFlowerSettings
-				    		 },
+				    			 "id": "crowdsourcing-ext/settings",
+				    			 "label": "CrowdFlower settings",
+				    			  click: ZemantaCrowdSourcingExtension.handlers.storeCrowdFlowerSettings
+				    		 }
 			              ]
-		 }
-		]
-});
+		 });
+
