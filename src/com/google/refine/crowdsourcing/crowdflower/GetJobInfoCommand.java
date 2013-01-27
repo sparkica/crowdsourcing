@@ -50,7 +50,7 @@ public class GetJobInfoCommand extends Command{
             //copy job, store id
             if(extension.has("job_id") && !extension.isNull("job_id")) {
                 
-                System.out.println("Job id: " + extension.getString("job_id"));        
+                logger.info("Copying job with id: " + extension.getString("job_id"));        
                 result = cf_client.getJob(extension.getString("job_id"));                   
                 JSONObject res = ParsingUtilities.evaluateJsonStringToObject(result);
       

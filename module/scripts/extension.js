@@ -55,7 +55,11 @@ ZemantaCrowdSourcingExtension.handlers.openJobSettingsDialog = function()  {
 	    		  {
 	    			  console.log("Status: " + o.status);
 	    			  if(o.status==="OK" | o.status=="200") {
-	    				alert("New job was created successfully.\n You can see it on your CrowdFlower profile.");  
+	    				  if(extension.new_job === true) {
+	    					  alert("New job was created successfully.\n You can see it on your CrowdFlower profile."); 
+	    				  } else {  
+	    					  alert("Data was uploaded successfully.\n You can see it on your CrowdFlower profile.");  
+	    				  }
 	    			  }
 	    		  },
 	    		  "json"
