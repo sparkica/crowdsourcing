@@ -98,13 +98,12 @@ function ZemantaCrowdFlowerDialog(onDone) {
 	    	  self._extension.column_names.push(col);
 	      });
 	      
-	      //console.log("CML: " + self._cml + '\n');
-	      //self._extension.cml = self._cml;
+	      console.log("CML: " + self._cml + '\n');
+	      self._extension.cml = self._cml;
 	      
 	      
 	      
 	  } else {
-		  console.log("Tabindex: " + tabindex);
 		  self._extension.new_job = false;
 		  self._extension.job_id =  self._elmts.allJobsList.children(":selected").val();
 		  console.log("Uploading to existing job...: " + self._extension.job_id);
