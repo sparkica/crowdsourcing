@@ -97,6 +97,36 @@ ZemantaCrowdSourcingExtension.handlers.evaluateReconDialog = function()  {
 };
 
 
+ZemantaCrowdSourcingExtension.handlers.imageReconDialog = function()  {
+	
+	new ZemCFImgReconDialog(function(extension) {
+		
+	      $.post(
+	    		  "command/crowdsourcing/image-recon-job",
+	    		  { "project" : theProject.id, 
+	    			"extension": JSON.stringify(extension),
+	    			"engine" : JSON.stringify(ui.browsingEngine.getJSON())
+	    		  },
+	    		  function(o)
+	    		  {
+	    			  if(o === null) {
+	    				  alert("There is something wrong with your data. It was not uploaded to CrowdFlower Service.");
+	    			  }
+	    			  else {
+		    			  if(o.status == "ok" || o.status == 200) {
+		    				  alert("Data successfully uploaded. Check your CrowdFlower account.");
+		    			  } else {
+		    				  alert("Something went wrong while uploading. \n" + o.status);
+		    			  }
+	    			  }
+	    		  },
+	    		  "json"
+	      );     
+
+	});
+};
+
+
 
 ZemantaCrowdSourcingExtension.handlers.getApiKey =  function() {
 	console.log("Getting API key...");
@@ -126,6 +156,11 @@ ExtensionBar.addExtensionMenu({
 	    			            	 "label": "Evaluate reconciled data",
 	    			            	 click: ZemantaCrowdSourcingExtension.handlers.evaluateReconDialog	 
 	    			             },
+	    			             {
+	    			            	 "id":"crowdsourcing-ext/templates/recon-img",
+	    			            	 "label": "Reconcile images",
+	    			            	 click: ZemantaCrowdSourcingExtension.handlers.imageReconDialog
+	    			             }
 	    			             ]
 	    		 },
 	    		 {},

@@ -99,8 +99,6 @@ ZemantaCFEvaluateReconDialog.prototype._renderColumns = function() {
 	var gold2 = self._elmts.goldColumn2;
 	var reconCol = self._elmts.reconColumns;
 	
-	var chkid = 0;
-
 	var renderColumns = function(columns, elem) {
 		
 		$.each(columns, function(index, value){			

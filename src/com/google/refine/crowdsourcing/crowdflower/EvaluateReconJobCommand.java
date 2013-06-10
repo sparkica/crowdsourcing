@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.zemanta.crowdflower.client.CrowdFlowerClient;
 
 public class EvaluateReconJobCommand extends Command{
-    static final Logger logger = LoggerFactory.getLogger("crowdflower_evaluatefreebaserecon");
+    static final Logger logger = LoggerFactory.getLogger("crowdflower_evaluate_recon");
     protected List<Integer> _cell_indeces;
     protected String FREEBASE_VIEW_URL = "http://www.freebase.com/view";
     protected String reconService = "freebase"; //default
