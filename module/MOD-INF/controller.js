@@ -56,7 +56,6 @@ function init() {
       "scripts/util.js",
       "scripts/dialogs/crowdflower-api-settings-dialog.js",
       "scripts/dialogs/crowdflower-job-columns-dialog.js",
-      "scripts/dialogs/crowdflower-create-gold-dialog.js",
       "scripts/dialogs/crowdflower-eval-recon-dialog.js",
       "scripts/dialogs/crowdflower-img-recon-dialog.js",
     ]
