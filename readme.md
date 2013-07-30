@@ -11,4 +11,4 @@ Extension requires CrowdFlowerClient library. You can get it [here] (https://git
 It works best (and looks best) in LODRefine - it is already integrated into it, no need to build and install it. 
 Of course you can can use it in OpenRefine, but you may experience a glitch or two.
 
-**Note**: this extension doesn't work well in the _old_ Refine v2.5, because it uses outdated libraries.
+**Note**: this extension doesn't work well in the _old_ Refine v2.5, because 2.5 it uses some outdated libraries.
