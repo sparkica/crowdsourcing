@@ -29,7 +29,6 @@
     <property name="name" value="crowdsourcing" />
     <property name="fullname" value="${name}-${version}" />
 
-    <property name="java6.boot.classpath" value="${env.JAVA6_BOOTCLASSES}" />
     
     <property name="refine.dir" value="${basedir}/../../main" />
     <property name="refine.webinf.dir" value="${refine.dir}/webapp/WEB-INF" />
@@ -61,7 +60,7 @@
             
     <target name="build_java">
         <mkdir dir="${classes.dir}" />
-        <javac source="${java_version}" target="${java_version}" bootclasspath="${java6.boot.classpath}" encoding="utf-8" destdir="${classes.dir}" debug="true" includeAntRuntime="no">
+        <javac encoding="utf-8" source="${java_version}" target="${java_version}"  destdir="${classes.dir}" debug="true" includeAntRuntime="no">
             <src path="${src.dir}"/>
             <classpath refid="class.path" />
         </javac>
