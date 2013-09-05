@@ -1,5 +1,5 @@
 
-package com.google.refine.crowdsourcing.crowdflower;
+package com.zemanta.crowdsourcing.crowdflower.commands;
 
 //TODO: does it make sense to implement an importer to import data *from* CF?
 
@@ -17,7 +17,6 @@ import com.google.refine.browsing.Engine;
 import com.google.refine.browsing.FilteredRows;
 import com.google.refine.browsing.RowVisitor;
 import com.google.refine.commands.Command;
-import com.google.refine.crowdsourcing.CrowdsourcingUtil;
 import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
@@ -33,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zemanta.crowdflower.client.CrowdFlowerClient;
+import com.zemanta.crowdsourcing.CrowdsourcingUtil;
 
 public class EvaluateReconJobCommand extends Command {
 
@@ -74,6 +74,7 @@ public class EvaluateReconJobCommand extends Command {
                                 if (result.has("response") && !result.getString("status").equals("ERROR")) {
                                         generateResponse(response, result);
                                 } else {
+                                        result.put("status", "error");
                                         generateErrorResponse(response, result);
                                 }
 
@@ -296,16 +297,6 @@ public class EvaluateReconJobCommand extends Command {
                                         obj.put("suggestion_name_" + i, "(no suggestion)");
                                         obj.put("suggestion_url_" + i, "#");
                                 }
-
-                                // obj.put("suggestion_name_1",
-                                // "(no suggestion)");
-                                // obj.put("suggestion_name_2",
-                                // "(no suggestion)");
-                                // obj.put("suggestion_name_3",
-                                // "(no suggestion)");
-                                // obj.put("suggestion_url_1", "#");
-                                // obj.put("suggestion_url_2", "#");
-                                // obj.put("suggestion_url_3", "#");
                         }
 
                         bf.append(obj.toString());

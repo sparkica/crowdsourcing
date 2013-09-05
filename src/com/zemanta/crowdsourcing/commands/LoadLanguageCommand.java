@@ -1,4 +1,4 @@
-package com.google.refine.crowdsourcing.commands;
+package com.zemanta.crowdsourcing.commands;
 
 import java.io.BufferedReader;
 import java.io.File;

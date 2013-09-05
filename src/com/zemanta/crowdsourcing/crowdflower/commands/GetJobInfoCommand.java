@@ -1,5 +1,5 @@
 
-package com.google.refine.crowdsourcing.crowdflower;
+package com.zemanta.crowdsourcing.crowdflower.commands;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.refine.commands.Command;
-import com.google.refine.crowdsourcing.CrowdsourcingUtil;
 import com.google.refine.util.ParsingUtilities;
 import com.zemanta.crowdflower.client.CrowdFlowerClient;
+import com.zemanta.crowdsourcing.CrowdsourcingUtil;
 
 public class GetJobInfoCommand extends Command {
 
@@ -57,6 +57,7 @@ public class GetJobInfoCommand extends Command {
                                 JSONObject res = ParsingUtilities.evaluateJsonStringToObject(result);
 
                                 if (res.getString("status").equals("ERROR")) {
+                                        res.put("status", "error");
                                         generateErrorResponse(response, res);
                                 } else {
 

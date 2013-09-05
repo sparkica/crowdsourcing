@@ -1,5 +1,5 @@
 
-package com.google.refine.crowdsourcing.crowdflower;
+package com.zemanta.crowdsourcing.crowdflower.commands;
 
 //TODO: does it make sense to implement an importer to import data *from* CF?
 
@@ -17,7 +17,6 @@ import com.google.refine.browsing.Engine;
 import com.google.refine.browsing.FilteredRows;
 import com.google.refine.browsing.RowVisitor;
 import com.google.refine.commands.Command;
-import com.google.refine.crowdsourcing.CrowdsourcingUtil;
 import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
@@ -32,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zemanta.crowdflower.client.CrowdFlowerClient;
+import com.zemanta.crowdsourcing.CrowdsourcingUtil;
 
 public class CreateNewJobCommand extends Command {
 
@@ -70,6 +70,7 @@ public class CreateNewJobCommand extends Command {
 
                                 if (job.getString("status").equals("ERROR")) {
                                         result = job;
+                                        result.put("status", "error");
                                 }
                         } else {
                                 if (extension.has("job_id")) {
@@ -95,6 +96,7 @@ public class CreateNewJobCommand extends Command {
                                                         extension.getString("cml"), cf_client);
 
                                         if (obj_tmp.get("status").equals("ERROR")) {
+                                                obj_tmp.put("status", "error");
                                                 generateErrorResponse(response, obj_tmp);
                                         } else {
                                                 generateResponse(response, obj_tmp);

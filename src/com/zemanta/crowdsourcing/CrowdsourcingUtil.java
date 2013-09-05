@@ -1,5 +1,5 @@
 
-package com.google.refine.crowdsourcing;
+package com.zemanta.crowdsourcing;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;

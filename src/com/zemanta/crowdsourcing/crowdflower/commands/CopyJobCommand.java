@@ -1,5 +1,5 @@
 
-package com.google.refine.crowdsourcing.crowdflower;
+package com.zemanta.crowdsourcing.crowdflower.commands;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -17,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.refine.commands.Command;
-import com.google.refine.crowdsourcing.CrowdsourcingUtil;
 import com.google.refine.util.ParsingUtilities;
 import com.zemanta.crowdflower.client.CrowdFlowerClient;
+import com.zemanta.crowdsourcing.CrowdsourcingUtil;
 
 public class CopyJobCommand extends Command {
 
@@ -48,6 +48,7 @@ public class CopyJobCommand extends Command {
 
                         if (result.has("status") && !result.isNull("status")
                                         && result.getString("status").equals("ERROR")) {
+                                result.put("status", "error");
                                 generateErrorResponse(response, result);
                         } else {
 
@@ -60,6 +61,7 @@ public class CopyJobCommand extends Command {
                                 JSONObject obj = getUpdatedJobList(cf_client);
 
                                 if (obj.has("status") && obj.getString("status").equals("ERROR")) {
+                                        obj.put("status","error");
                                         obj.put("source", "[updating job list]");
                                         generateErrorResponse(response, obj);
                                 } else {
@@ -92,6 +94,7 @@ public class CopyJobCommand extends Command {
                 JSONArray jobs_updated = null;
 
                 if (obj.has("status") && obj.getString("status").equals("ERROR")) {
+                        obj.put("status","error");
                         return obj;
                 }
 
@@ -132,7 +135,9 @@ public class CopyJobCommand extends Command {
                         JSONObject obj = ParsingUtilities.evaluateJsonStringToObject(res_msg);
 
                         if (obj.getString("status").equals("ERROR")) {
+                                
                                 result = obj;
+                                result.put("status", "error");
                         } else {
                                 JSONObject res = obj.getJSONObject("response");
                                 if (res.has("id") && !res.isNull("id")) {

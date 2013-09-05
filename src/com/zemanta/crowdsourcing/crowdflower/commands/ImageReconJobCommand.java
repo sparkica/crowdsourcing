@@ -1,5 +1,5 @@
 
-package com.google.refine.crowdsourcing.crowdflower;
+package com.zemanta.crowdsourcing.crowdflower.commands;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -22,13 +22,13 @@ import com.google.refine.browsing.Engine;
 import com.google.refine.browsing.FilteredRows;
 import com.google.refine.browsing.RowVisitor;
 import com.google.refine.commands.Command;
-import com.google.refine.crowdsourcing.CrowdsourcingUtil;
 import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
 import com.google.refine.util.ParsingUtilities;
 import com.zemanta.crowdflower.client.CrowdFlowerClient;
+import com.zemanta.crowdsourcing.CrowdsourcingUtil;
 
 public class ImageReconJobCommand extends Command {
 
@@ -66,6 +66,7 @@ public class ImageReconJobCommand extends Command {
                                 if (result.has("response") && !result.getString("status").equals("ERROR")) {
                                         generateResponse(response, result);
                                 } else {
+                                        result.put("status", "error");
                                         generateErrorResponse(response, result);
                                 }
 
