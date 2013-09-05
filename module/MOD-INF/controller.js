@@ -38,10 +38,7 @@ var RS = Packages.com.google.refine.RefineServlet;
 
 var logger = Packages.org.slf4j.LoggerFactory.getLogger("crowdsourcing"),
     File = Packages.java.io.File,
-    refineServlet = Packages.com.google.refine.RefineServlet,
-    ner = Packages.org.freeyourmetadata.ner,
-    services = ner.services,
-    commands = ner.commands;
+    refineServlet = Packages.com.google.refine.RefineServlet;
 
 /*
  * Function invoked to initialize the extension.
@@ -55,7 +52,8 @@ function init() {
   RS.registerCommand(module, "get-crowdflower-job", new Packages.com.google.refine.crowdsourcing.crowdflower.GetJobInfoCommand());
   RS.registerCommand(module, "evaluate-recon-job", new Packages.com.google.refine.crowdsourcing.crowdflower.EvaluateReconJobCommand());
   RS.registerCommand(module, "image-recon-job", new Packages.com.google.refine.crowdsourcing.crowdflower.ImageReconJobCommand());
-  
+  RS.registerCommand(module, "load-language", new Packages.com.google.refine.crowdsourcing.commands.LoadLanguageCommand());
+
   // Script files to inject into /project page
   ClientSideResourceManager.addPaths(
     "project/scripts",
